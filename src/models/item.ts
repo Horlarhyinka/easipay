@@ -23,4 +23,4 @@ const itemSchema = new Schema({
     }
 })
 
-export default model<item_model, item_int>("item", itemSchema)
+export default itemSchema

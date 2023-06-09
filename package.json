@@ -51,6 +51,5 @@
     "passport": "^0.6.0",
     "passport-google-oauth20": "^2.0.0",
     "supertest": "^6.3.3"
-  },
-  "type": "module"
+  }
 }

@@ -4,13 +4,14 @@ import dotenv from "dotenv";
 import cors from "cors";
 import helemt from "helmet";
 import rateLimit from "express-rate-limit";
-import authRoute from "./routes/auth"
+import authRoute from "./routes/auth";
+import orderRouter from "./routes/order";
 import mongoose from "mongoose";
 import connectDB from "./config/db";
 import passport from "passport";
 import session from "express-session";
 import MongoStore from "connect-mongo";
-import cookieParser from "cookie-parser"
+import cookieParser from "cookie-parser";
 dotenv.config()
 
 const app: Application = express()
@@ -40,6 +41,7 @@ app.use(cookieParser())
 
 //use routes middlewares
 app.use("/api/v1/auth",authRoute)
+app.use("/api/v1/order", orderRouter)
 
 async function start(){
 

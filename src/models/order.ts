@@ -1,16 +1,20 @@
 import { Model, Schema, Types, model } from "mongoose";
 import { order_int, order_model } from "./types/order";
+import itemSchema from "./item";
+import payment_methods from "../util/payment_methods";
 
 const orderSchema = new Schema<order_int>({
     items: {
-         type: [Types.ObjectId], 
-         ref: "item",
+         type: [itemSchema],
          required: true
         },
     total: Number,
     method: {
         type: String,
-        enum: ["CARD", "USSD", "PAYPAL", "CRYPTO"]
+        enum: payment_methods
+    },
+    note: {
+        type: String
     }
 })
 
