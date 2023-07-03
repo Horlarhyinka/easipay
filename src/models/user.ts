@@ -8,13 +8,13 @@ const userSchema = new Schema<user_int>({
     email: {
         type: String,
         required: true,
-        match: mail_regex,
+        match: [mail_regex, "invalid email address"],
         unique: true
     },
     password: {
         type: String,
-        requied: true,
-        minlength: 6
+        required: true,
+        minlength: [6, "password length must be greater than or equal to 6"]
     },
     firstName: {
         type: String,
@@ -23,6 +23,12 @@ const userSchema = new Schema<user_int>({
     tel: {
         type: String,
         match: tel_regex
+    },
+    resetToken:{
+        type: String
+    },
+    tokenExpiresIn: {
+        type: Date
     }
 },{
     timestamps: true

@@ -21,14 +21,4 @@ const Media = multer({storage})
 
 export const uploadMany = Media.array("images",20)
 export const uploadOne = Media.single("image")
-
-export const smartUpload = async(req: Request, res: Response, next: NextFunction) =>{
-    try{
-        console.log("try one")
-        return uploadOne
-    }catch(ex){
-        console.log("try many", ex)
-        return uploadMany
-    }
-    next()
-}
+export const uploadAny = Media.any()

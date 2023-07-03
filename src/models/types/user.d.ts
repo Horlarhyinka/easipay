@@ -1,4 +1,4 @@
-import { Document, Model } from "mongoose";
+import { Document, Model, ObjectId } from "mongoose";
 
 export interface user_int extends Document{
     email: string,
@@ -6,9 +6,12 @@ export interface user_int extends Document{
     firstName?:string, 
     lastName? : string, 
     tel?: string,
-    links: string[],
+    links: (string | ObjectId)[],
+    orders: (string | ObjectId)[]
     genToken: ()=>string,
-    validatePassword: (password: string)=>Promise<boolean>
+    validatePassword: (password: string)=>Promise<boolean>,
+    resetToken: string | undefined,
+    tokenExpiresIn: Date | undefined
 }
 
 interface user_model extends Model<user_int>{

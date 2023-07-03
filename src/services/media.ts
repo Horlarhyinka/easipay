@@ -1,8 +1,9 @@
 import {v2 as cloudinary} from "cloudinary";
 import dotenv from "dotenv";
-import { rmdir } from "fs";
+import fs from "fs";
 import path from "path";
 import { Request } from "express";
+import flushMedias from "../util/flushMedias";
 
 dotenv.config()
 
@@ -14,12 +15,13 @@ cloudinary.config({
     cloud_name: CLOUDINARY_NAME
 })
 
-const upload = async(path: string): Promise<string | null> =>{
+const upload = async(dir: string): Promise<string | null> =>{
     try{
-       const data = await cloudinary.uploader.upload(path)
-       rmdir(path,()=>{})
+       const data = await cloudinary.uploader.upload(dir)
+       fs.unlink(dir,(err)=>{ if(err)throw err })
        return data.secure_url
     }catch(ex){
+        flushMedias()
         return null
     }
 }
@@ -36,18 +38,25 @@ const destroy = async(url: string): Promise<void> =>{
 class Media{
     destroy = destroy;
     handleMedias = async(arg: Request["files"] | Request["file"]) =>{
-        if(!Array.isArray(arg)){
+        try{
+if(!Array.isArray(arg)){
             const file = arg as Request["file"]
             if(!file)return null;
             const res = await upload(file!.path)
-            return [res]
+            return [res!]
         }
         const files = arg as Request["files"]
         if(!files)return null;
-        const urls = Promise.all((files as Request["file"][]).map(async(file)=>{
-            return await upload(file!.path)
-        }))
-        return urls
+        try{
+        return Promise.all((files as Request["file"][]).map(async(file)=> upload(file!.path)))
+        }catch(ex){
+            console.log(ex)
+        }
+        }catch(ex){
+            console.log(ex)
+            return null
+        }
+        
     }
 }
 

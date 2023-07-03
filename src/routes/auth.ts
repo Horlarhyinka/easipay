@@ -7,6 +7,8 @@ const router = Router()
 
 router.post("/register",auth.register)
 router.post("/login", auth.login)
+router.post("/forget-password", auth.forgetPasswordTokenRequest)
+router.patch("/forget-password/:token", auth.resetPassword)
 router.get("/google", usePassport)
 router.get("/redirect", passport.authenticate("google"), auth.oauthRedirect)
 

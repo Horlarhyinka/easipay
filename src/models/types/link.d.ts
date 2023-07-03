@@ -3,8 +3,12 @@ import { user_int } from "./user"
 
 export interface link_int extends Document{
     url: string,
-    revoke: ()=>Promise<void>,
-    active: boolean
+    updateStatus: ()=>Promise<link_int | null>,
+    status: string,
+    discuss: boolean,
+    chatId?: string | ObjectId,
+    expiresIn: Date | number,
+    order: string | ObjectId
 }
 
 declare enum status_enum {ACTIVE, REVOKED}

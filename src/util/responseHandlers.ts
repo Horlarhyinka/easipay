@@ -12,7 +12,7 @@ export const sendInvalidEntry = (res: Response, field?: string) =>{
 }
 
 export const sendDuplicateResource = (res: Response, field?: string)=>{
-    const message = !field? "duplicate resource": field + "already exists"
+    const message = !field? "duplicate resource": field + " already exists"
     return res.status(409).json({message})
 }
 
@@ -21,7 +21,7 @@ export const sendMissingDependency = (res: Response, field?: string) =>{
     return res.status(400).json({message})
 }
 
-export const sendResourceNotound = (res: Response, resource?:string) =>{
+export const sendResourceNotFound = (res: Response, resource?:string) =>{
     const message = `${resource && resource} not found`
     return res.status(404).json({message})
 }

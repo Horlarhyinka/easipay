@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        *{
+            margin: 3px;
+        }
+        div{
+            display: inline-block;
+        }
+        label{
+            display: block;
+        }
+        input{
+            display: block;
+        }
+        textarea{
+            display: block;
+        }
+
+    </style>
+</head>
+<body>
+    <form method="PUT" action="/api/v1/order" >
+        <% for(let i = 0; i < 2; i++){ %>
+        <div id= "wrapper-<%= i %>">
+            <h4>item <%= i + 1 %></h4>
+            <label> name: </label>
+            <input type="text" required name="name" id="name-<%= i %>" >
+            <label>quantity: </label>
+            <input type="number" required name="quantity" id="quantity-<%= i %>" >
+            <label>price: </label>
+            <input type="number" required name="price" id="price-<%= i %>" >
+            <label for="note" >NOTE: </label>
+            <textarea name="note" required id="note-<%= i %>" ></textarea>
+            <label>select images</label>
+            <input id="files-<%= i %>" aria-required="true" type="file" multiple required >
+        </div>
+        <% } %>
+        <button>Submit</button>
+    </form>
+    <script>
+    const items = {}
+   const order = {
+    items: []
+   }
+   const body = new FormData()
+   const form = document.querySelector("form")
+   for(let i = 0; i < form.children.length - 1; i++){
+    const item = {
+        id: i
+    }
+    let target;
+    items[String(i)] = item
+    const child = form.children[i]
+    const name = document.getElementById("name-"+ i)
+    name?.addEventListener("change",(e)=>{
+        item.name = e.target.value
+    })
+    const quantity = document.getElementById("quantity-" + i)
+    quantity?.addEventListener("change",(e)=>{
+        item.quantity = e.target.value
+    })
+    const price = document.getElementById("price-" + i)
+    price?.addEventListener("change",(e)=>{
+        item.price = e.target.value
+    })
+    const note = document.getElementById("note-" + i)
+    note?.addEventListener("change",(e)=>{
+        item.note = e.target.value
+    })
+    const files = document.getElementById("files-" + i)
+
+    files?.addEventListener("change", (e)=>{
+        const files = e.target.files
+        for(let j = 0; j < files.length; j++){
+            body.append("image-"+i ,files[j])
+        }
+        
+    })
+   }
+
+    document.querySelector("button").addEventListener("click", async(e)=>{
+       
+        document.querySelector("form").addEventListener("submit", (e)=>e.preventDefault())
+        try{
+    const data = { items: Object.keys(items).map(itm=>items[itm]), method: "CARD"}
+    console.log("before >>",data.items)
+    for(let key in data){
+        let d = data[key]
+        if(typeof d !== "string"){
+            d = JSON.stringify(d)
+        }
+        body.delete(key)
+        body.append(key, JSON.stringify(d))
+    }
+    console.log(body.get("method"))
+    const res = await fetch("/api/v1/order",{method: "POST", body })
+    console.log(res)
+        }catch(ex){
+            console.log(ex)
+        }
+
+   })
+
+    </script>
+</body>
+</html>

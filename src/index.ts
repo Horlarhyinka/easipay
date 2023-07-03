@@ -6,18 +6,29 @@ import helemt from "helmet";
 import rateLimit from "express-rate-limit";
 import authRoute from "./routes/auth";
 import orderRouter from "./routes/order";
-import mongoose from "mongoose";
 import connectDB from "./config/db";
 import passport from "passport";
 import session from "express-session";
 import MongoStore from "connect-mongo";
 import cookieParser from "cookie-parser";
+import path from "path";
+import notFound from "./routes/not-found";
+
 dotenv.config()
 
 const app: Application = express()
 const Server = createServer(app);
 const {PORT, NODE_ENV} = process.env
 const port = NODE_ENV?.includes("test")? undefined: PORT;
+
+//set view engine
+app.set("views", path.join(__dirname, "/views"))
+app.set("view engine", "ejs")
+
+
+app.get("/test", (req: Request, res: Response)=>{
+    res.render("test")
+})
 
 //configure middlewares
 app.use(cors())
@@ -42,6 +53,7 @@ app.use(cookieParser())
 //use routes middlewares
 app.use("/api/v1/auth",authRoute)
 app.use("/api/v1/order", orderRouter)
+app.use(notFound)
 
 async function start(){
 
