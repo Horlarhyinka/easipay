@@ -7,7 +7,7 @@ export interface link_int extends Document{
     status: string,
     discuss: boolean,
     chatId?: string | ObjectId,
-    expiresIn: Date | number,
+    expiresIn: Date,
     order: string | ObjectId
 }
 

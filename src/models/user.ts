@@ -1,15 +1,19 @@
-import { Schema, model } from "mongoose";
+import { ObjectId, Schema, model } from "mongoose";
 import { user_int } from "./types/user";
 import { mail_regex, tel_regex } from "../util/regex";
-import jwt from "jsonwebtoken"
+import jwt from "jsonwebtoken";
+import "./order";
+import "./link";
 import bcrypt from "bcrypt";
+import { order_int } from "./types/order";
 
 const userSchema = new Schema<user_int>({
     email: {
         type: String,
         required: true,
         match: [mail_regex, "invalid email address"],
-        unique: true
+        unique: true,
+        immutable: true
     },
     password: {
         type: String,
@@ -29,9 +33,18 @@ const userSchema = new Schema<user_int>({
     },
     tokenExpiresIn: {
         type: Date
+    },
+    orders: {
+        type: [Schema.Types.ObjectId],
+        ref: "order"
+    },
+    links: {
+        type: [Schema.Types.ObjectId],
+        ref: "link"
     }
 },{
-    timestamps: true
+    timestamps: true,
+    virtuals: true
 })
 
 userSchema.pre("save", async function(){

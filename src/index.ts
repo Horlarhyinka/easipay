@@ -6,6 +6,7 @@ import helemt from "helmet";
 import rateLimit from "express-rate-limit";
 import authRoute from "./routes/auth";
 import orderRouter from "./routes/order";
+import linkRouter from "./routes/link";
 import connectDB from "./config/db";
 import passport from "passport";
 import session from "express-session";
@@ -52,7 +53,8 @@ app.use(cookieParser())
 
 //use routes middlewares
 app.use("/api/v1/auth",authRoute)
-app.use("/api/v1/order", orderRouter)
+app.use("/api/v1/orders", orderRouter)
+app.use("/api/v1/links", linkRouter)
 app.use(notFound)
 
 async function start(){

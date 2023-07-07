@@ -17,7 +17,7 @@ export const sendDuplicateResource = (res: Response, field?: string)=>{
 }
 
 export const sendMissingDependency = (res: Response, field?: string) =>{
-    const message = !field? "missing dependency": field + "is required"
+    const message = !field? "missing dependency": field + " is required"
     return res.status(400).json({message})
 }
 

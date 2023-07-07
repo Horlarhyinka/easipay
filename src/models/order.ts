@@ -11,7 +11,7 @@ const orderSchema = new Schema<order_int>({
     total: Number,
     method: {
         type: String,
-        enum: payment_methods
+        enum:[...Object.values(payment_methods)]
     },
     note: {
         type: String
@@ -19,5 +19,4 @@ const orderSchema = new Schema<order_int>({
 })
 
 
-
-export default model<order_int, order_model >("order", orderSchema)
+export default model("order", orderSchema)

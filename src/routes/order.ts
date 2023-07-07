@@ -1,11 +1,16 @@
 import { Router } from "express";
-import { uploadAny, uploadMany, uploadOne } from "../middlewares/media";
 import auth from "../middlewares/auth"
-import { createOrder } from "../controllers/order";
-import { Request, Response } from "express";
+import * as order from "../controllers/order";
+import validateObjectIdParam from "../middlewares/validateObjectIdParam"
+
 const router = Router()
 
-// router.use(auth)
-router.post("/", uploadAny, createOrder)
+router.use(auth)
+router.post("/", order.createOrder)
+router.get("/", order.getOrders)
+router.get("/:orderId", validateObjectIdParam, order.getOrder)
+router.put("/:orderId", validateObjectIdParam, order.updateOrder)
+router.put("/:orderId/items/:itemId", validateObjectIdParam, order.updateOrderItem )
+router.get("/:orderId/items/:itemId", validateObjectIdParam, order.getOrderItem )
 
 export default router;

@@ -1,1 +1,1 @@
-export default ["CARD", "USSD", "PAYPAL", "CRYPTO"]
+export default {CARD: "CARD", TRANSFER: "TRANSFER", PAYPAL: "PAYPAL", CRYPTO: "CRYPTO", DEFAULT: "CARD"}

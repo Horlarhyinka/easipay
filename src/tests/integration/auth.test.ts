@@ -1,6 +1,6 @@
 import request from "supertest";
-import Server from "../";
-import User from "../models/user";
+import Server from "../..";
+import User from "../../models/user";
 
 const flushDb = async()=>User.deleteMany({})
 

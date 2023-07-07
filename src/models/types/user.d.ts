@@ -7,7 +7,7 @@ export interface user_int extends Document{
     lastName? : string, 
     tel?: string,
     links: (string | ObjectId)[],
-    orders: (string | ObjectId)[]
+    orders: (string | ObjectId )[],
     genToken: ()=>string,
     validatePassword: (password: string)=>Promise<boolean>,
     resetToken: string | undefined,

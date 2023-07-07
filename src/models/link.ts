@@ -1,13 +1,16 @@
-import mongoose, { Schema, model } from "mongoose";
+import mongoose, { ObjectId, Schema, model } from "mongoose";
 import { link_int, link_model } from "./types/link";
 import status from "../util/status";
 import { url_regex } from "../util/regex";
+import { user_int } from "./types/user";
+import { order_int } from "./types/order";
 
 const linkSchema = new Schema<link_int>({
     url:{
         type: String,
         required: true,
-        match: url_regex
+        match: url_regex,
+        immutable: true
     },
     status: {
         type: String,
@@ -17,7 +20,8 @@ const linkSchema = new Schema<link_int>({
     },
     order: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "order"
+        ref: "order",
+        immutable: true
     },
     discuss: {
         type: Boolean,
@@ -25,17 +29,19 @@ const linkSchema = new Schema<link_int>({
     },
     expiresIn: {
         type: Date,
-        default: new Date(Date.now() + 1000*60*60*24*30)
+        default: new Date(Date.now() + 1000*60*60*24*30) //expires in 30 days
     }
+},{
+    virtuals: true
 })
 
 linkSchema.pre("save", function(){
-    this.status = this.status.toUpperCase()
+    (this as link_int).status = (this as link_int).status.toUpperCase()
 })
 
 linkSchema.methods.updateStatus = function(newStatus: string){
-    if(!newStatus || !status[newStatus])return null;
+    if(!newStatus || !Object(status)[newStatus])return null;
     this.status = newStatus
 }
 
-export default model<link_int, link_model>("link", linkSchema)
+export default model("link", linkSchema)
