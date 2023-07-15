@@ -26,11 +26,6 @@ const port = NODE_ENV?.includes("test")? undefined: PORT;
 app.set("views", path.join(__dirname, "/views"))
 app.set("view engine", "ejs")
 
-
-app.get("/test", (req: Request, res: Response)=>{
-    res.render("test")
-})
-
 //configure middlewares
 app.use(cors())
 app.use(rateLimit({
