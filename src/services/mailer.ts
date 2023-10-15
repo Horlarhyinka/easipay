@@ -1,11 +1,10 @@
-import nodemailer, { Transport, TransportOptions } from "nodemailer";
-import dotenv from "dotenv";
+import nodemailer, { Transporter } from "nodemailer";
 import templates from "../util/templates";
 import ejs from "ejs";
 import path from "path";
+import config from "../config/config";
 
-dotenv.config()
-const {MAIL_HOST, MAIL_PORT, MAIL_SERVICE, MAIL_USER, MAIL_PASSWORD, MAIL_ADDRESS} = process.env
+const {host, user, pass, port, service, address} = config.SERVICES.MAIL
 
 interface mailer_int{
     sendPasswordResetMail: (passwordResetLink: string)=>Promise<void>,
@@ -13,17 +12,18 @@ interface mailer_int{
 
 }
 
+interface ExtTransporterOption extends Transporter{
+    auth: {
+        user: string
+        pass: string
+    }
+}
+
+const poolConfig = `smtps://${user}:${pass}@${host}/?service=${service}&&port=${port}`
+
 class Mailer implements mailer_int{
     private targetMail: string = "";
-    private transporter = nodemailer.createTransport({
-        port: 465,
-        host: MAIL_HOST!,
-        service: MAIL_SERVICE!,
-        auth:{
-            user: MAIL_USER!,
-            pass: MAIL_PASSWORD!
-        }
-    })
+    private transporter = nodemailer.createTransport(poolConfig)
     private mailOptions: {
         to: string,
         from: string,
@@ -34,7 +34,7 @@ class Mailer implements mailer_int{
         this.targetMail = targetUserMail
         this.mailOptions = {
                     to: this.targetMail,
-                    from: MAIL_ADDRESS!
+                    from: address
                 }
         }
     private sendMail = async <t>(options: t, templateName: string)=>{

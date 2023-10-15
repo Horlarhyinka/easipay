@@ -6,16 +6,24 @@ import payment_methods from "../util/payment_methods";
 import { sendMissingDependency, sendResourceNotFound, sendServerFailed } from "../util/responseHandlers";
 import catchMongooseErr from "../util/catchMongooseErr";
 import { user_int } from "../models/types/user";
-import { ObjectId } from "mongoose";
+import mongoose from "mongoose";
 import { order_int } from "../models/types/order";
 import { item_int } from "../models/types/item";
+import dotenv from "dotenv"
+
+dotenv.config()
+
+interface ExtReq extends Request{
+    user: user_int
+}
 
 export const createOrder = catchAsyncErrors(async(req: Request, res: Response)=>{
     interface item_int{name: string, price: number, note?: string, quantity?: number, images: string[]}
     const items: item_int[] = req.body.items 
     if(!items || !Array.isArray(items) || items.length < 1)return sendMissingDependency(res, "items list")
     let {method} = req.body
-    if(!method){
+    method && (method = method.toUpperCase())
+    if(!method || !payment_methods[method as keyof typeof payment_methods]){
         method = payment_methods.DEFAULT
     }
     method = method.toUpperCase();
@@ -25,7 +33,8 @@ export const createOrder = catchAsyncErrors(async(req: Request, res: Response)=>
         if(validationResponse.error)return res.status(400).json(validationResponse.error.message)
     }
     try{
-        const data: {method: string, items: item_int[], note?: string} = {items, method}
+        const data: {method: string, items: item_int[], note?: string, publicId: string} = {items, method,
+        publicId: String(new mongoose.Types.ObjectId())}
         const {note} = req.body
         if(note){
             data.note = note
@@ -45,14 +54,15 @@ export const createOrder = catchAsyncErrors(async(req: Request, res: Response)=>
 
 export const updateOrder = catchAsyncErrors(async(req: Request, res: Response)=>{
     const mutables = ["method", "note"]
-    const {orderId} = req.params || req.query || req.body
+    const orderId = req.params.orderId || req.query.orderId || req.body.orderId
     if(!orderId)return sendMissingDependency(res, "order id")
     const order = await Order.findById(orderId)
     if(!order)return sendResourceNotFound(res, "order")
-    const orderIndex = (req.user! as user_int).orders.findIndex((order: string | ObjectId)=>order.toString() === orderId.toString())
+    const orderIndex = (req.user! as user_int).orders.findIndex((order)=>order.toString() === orderId.toString())
     if(orderIndex < 0)return res.status(403).json({message: "forbiden"})
     let {method} = req.body
-    if(method){
+    method && (method = method.toUpperCase())
+    if(method && payment_methods[method as keyof typeof payment_methods]){
         req.body.method = method.toUpperCase()
     }
     try {
@@ -70,32 +80,37 @@ export const updateOrder = catchAsyncErrors(async(req: Request, res: Response)=>
     }
 })
 
-export const deleteOrder = catchAsyncErrors(async(req: Request, res: Response)=>{
-    const {orderId} = req.params || req.query
+export const deleteOrder = catchAsyncErrors(async(req: ExtReq, res: Response)=>{
+    const orderId = req.params.orderId || req.query
     if(!orderId)return sendMissingDependency(res, "order id")
-    const orderIndex = (req.user! as user_int).orders.findIndex((order: string | ObjectId)=>order.toString() === orderId.toString())
+    const orderIndex = (req.user!.orders as order_int[]).findIndex((order)=>order.toString() === orderId.toString())
     if(orderIndex < 0)return sendResourceNotFound(res, "order")
-    const deletedOrder = await Order.findByIdAndDelete(orderId)
+    const deletedOrder = await Order.findByIdAndDelete(String(orderId))
     if(!deletedOrder)return sendResourceNotFound(res, "order")
     return res.status(204).json(deletedOrder)
 })
 
-export const getOrders = catchAsyncErrors(async(req: Request, res: Response)=>{
-    const {orders} = await (req.user as user_int).populate("orders");
+export const getOrders = catchAsyncErrors(async(req: ExtReq, res: Response)=>{
+    const {orders} = await req.user.populate("orders");
     return res.status(200).json(orders)
 })
 
-export const getOrder = catchAsyncErrors(async(req: Request, res: Response)=>{
+export const getOrder = catchAsyncErrors(async(req: ExtReq, res: Response)=>{
     const {orderId} = req.params || req.query
     if(!orderId)return sendMissingDependency(res, "order id")
-    const orders = (await (req.user as user_int).populate("orders")).orders as unknown
-    const orderIndex = (orders as order_int[]).findIndex((order)=>order._id.toString() === orderId.toString())
-    if(orderIndex < 0)return sendResourceNotFound(res, "order")
-    return res.status(200).json((orders as order_int[])[orderIndex])
+    let result: order_int | null | undefined;
+    if(req.user){
+    const {orders} = await req.user.populate("orders")
+    result = (orders as order_int[]).find((order)=>order._id.toString() === orderId.toString())
+    if(result)return res.status(200).json(result)
+    }
+    result = await Order.findOne({publicId: orderId})
+    if(!result)return sendResourceNotFound(res, "order")
+    return res.status(200).json(result)
 })
 
 export const updateOrderItem = catchAsyncErrors(async(req: Request, res: Response)=>{
-    const {orderId, itemId} = req.params || req.query || req.body
+    const {orderId, itemId} = req.params
     if(!orderId)return sendMissingDependency(res, "order id")
     if(!itemId)return sendMissingDependency(res, "item id")
     const orderIndex = (req.user as user_int).orders.findIndex((order)=>order.toString() === orderId.toString())

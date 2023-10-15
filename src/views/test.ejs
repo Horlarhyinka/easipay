@@ -89,7 +89,7 @@
         document.querySelector("form").addEventListener("submit", (e)=>e.preventDefault())
         try{
     const data = { items: Object.keys(items).map(itm=>items[itm]), method: "CARD"}
-    console.log("before >>",data.items)
+    // console.log("before >>",data.items)
     for(let key in data){
         let d = data[key]
         if(typeof d !== "string"){
@@ -98,7 +98,7 @@
         body.delete(key)
         body.append(key, JSON.stringify(d))
     }
-    console.log(body.get("method"))
+    // console.log(body.get("method"))
     const res = await fetch("/api/v1/order",{method: "POST", body })
     console.log(res)
         }catch(ex){

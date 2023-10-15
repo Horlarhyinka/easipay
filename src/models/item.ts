@@ -1,7 +1,7 @@
 import { Schema, model } from "mongoose";
 import {item_int, item_model} from "./types/item"
 
-const itemSchema = new Schema({
+const itemSchema = new Schema<item_int>({
     name: {
         type: String,
         required: true

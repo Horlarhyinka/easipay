@@ -3,9 +3,8 @@ import { user_int } from "./types/user";
 import { mail_regex, tel_regex } from "../util/regex";
 import jwt from "jsonwebtoken";
 import "./order";
-import "./link";
 import bcrypt from "bcrypt";
-import { order_int } from "./types/order";
+import config from "../config/config";  
 
 const userSchema = new Schema<user_int>({
     email: {
@@ -37,10 +36,6 @@ const userSchema = new Schema<user_int>({
     orders: {
         type: [Schema.Types.ObjectId],
         ref: "order"
-    },
-    links: {
-        type: [Schema.Types.ObjectId],
-        ref: "link"
     }
 },{
     timestamps: true,
@@ -60,7 +55,7 @@ userSchema.methods.validatePassword = function(password: string):Promise<boolean
 
 userSchema.methods.genToken = function(){
     const body = {id: this._id}
-    return jwt.sign(body, process.env.SECRET!,{expiresIn: "2d"})
+    return jwt.sign(body, config.APP.secret,{expiresIn: "2d"})
 }
 
 export default model("user", userSchema)

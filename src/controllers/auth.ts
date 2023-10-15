@@ -7,6 +7,7 @@ import crypto from "crypto";
 import bcrypt from "bcrypt";
 import Mailer from "../services/mailer";
 import catchMongooseErr from "../util/catchMongooseErr";
+import config from "../config/config";
 
 export const register = catchAsync(async(req: Request, res: Response)=>{
     const {email, password} = req.body;
@@ -56,7 +57,7 @@ export const forgetPasswordTokenRequest = catchAsync(async(req: Request, res: Re
     user.resetToken = token;
     user.tokenExpiresIn = new Date(Date.now() + 1000 * 60 * 15)
     await user.save()
-    const url = process.env.APP_UI_URL + "/" + token
+    const url = config.APP.client_url + "/" + token
     try{
     const mailer = new Mailer(email)
     await mailer.sendPasswordResetMail(url)

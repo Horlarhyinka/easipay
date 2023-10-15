@@ -1,6 +1,3 @@
-import { MongooseError } from "mongoose"
-
-
 export default (ex: Error | any) =>{
     const messages: string[] = []
         for(let key in ex.errors){
