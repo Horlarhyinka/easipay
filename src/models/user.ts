@@ -23,6 +23,9 @@ const userSchema = new Schema<user_int>({
         type: String,
         minlength: 3
     },
+    lastName:{
+        type: String
+    },
     tel: {
         type: String,
         match: tel_regex
@@ -36,6 +39,16 @@ const userSchema = new Schema<user_int>({
     orders: {
         type: [Schema.Types.ObjectId],
         ref: "order"
+    },
+    username: {
+        type: String
+    },
+    avatar: {
+        type: String
+    },
+    country:{
+        type: String,
+        default: "NG"
     }
 },{
     timestamps: true,

@@ -14,7 +14,8 @@ import config from "./config/config";
 
 import authRoute from "./routes/auth";
 import orderRouter from "./routes/order";
-import invoiceRouter from "./routes/invoice"
+import invoiceRouter from "./routes/invoice";
+import profileRouter from "./routes/profile";
 
 const app: Application = express()
 const Server = createServer(app);
@@ -49,6 +50,7 @@ app.use(cookieParser())
 app.use("/api/v1/auth",authRoute)
 app.use("/api/v1/orders", orderRouter)
 app.use("/api/v1/invoice", invoiceRouter)
+app.use("/api/v1/profile", profileRouter)
 
 app.use(notFound)
 

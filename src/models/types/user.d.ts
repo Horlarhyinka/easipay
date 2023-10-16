@@ -12,6 +12,9 @@ export interface user_int extends Document{
     validatePassword: (password: string)=>Promise<boolean>,
     resetToken: string | undefined,
     tokenExpiresIn: Date | undefined
+    username?: string
+    avatar?: string
+    country?: string
 }
 
 export type user_ref_type = user_int | string | ObjectId
