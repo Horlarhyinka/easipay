@@ -17,44 +17,50 @@ class FWV implements fwv_int{
             currency: obj.currency || "NGN",
             redirect_url: config.APP.baseUrl + "/payments/redirect",
             customization: "add customization later",
-            logo: "add logo later"
-        }, {headers: { Authorization: `Bearer ${this.secret_key}`}})) as { message: string, data: {link: string}}
+            logo: "add logo later",
+            tx_ref: String(new mongoose.Types.ObjectId())
+        }, {headers: { Authorization: `Bearer ${this.secret_key}`}})).data as { message: string, data: {link: string}}
+        console.log({res}, res.data)
         return res.data.link
     }
     createSubaccount = async(obj: { account_name: string; email: string; mobilenumber: string; country: string; })=>{
         const res = (await axios.post(this.base_url + "/payout-subaccounts", {
-            ...obj,
-            account_reference: String(new mongoose.Types.ObjectId())
+            ...obj
         }, {
             headers: {Authorization: `Bearer ${this.secret_key}`}
-        })) as {status: string, data: subaccount_int}
+        })).data as {status: string, data: subaccount_int}
+        console.log(res.data, 1)
         return res.data.account_reference
     }
     getSubaccount = async(ref: string) =>{
         const res = (await axios.get(this.base_url + "/payout-subaccounts/" + ref, {
             headers: {Authorization: `Bearer ${this.secret_key}`}
-        })) as {status: string, data: subaccount_int}
+        })).data as {status: string, data: subaccount_int}
         return res.data
     }
 
-    updateSubaccount = async(ref: string, update: { account_name: string; mobilenumber: string; })=>{
+    updateSubaccount = async(ref: string, update: { account_name: string; mobilenumber: string; email: string; country: string})=>{
         const res = (await axios.put(this.base_url + "/payout-subaccounts/" + ref, {...update}, {headers:{
             Authorization: `Bearer ${this.secret_key}`
-        }})) as {status: string, data: subaccount_int}
+        }})).data as {status: string, data: subaccount_int}
         return res.data
     }
 
-    getTransactions = async(ref: string, from: string, to: string, currency: string) =>{
-        const res = (await axios.get(this.base_url + "/payout-subaccounts/" + ref + "/transactions", {
+    getTransactions = async(ref: string, currency: string, from?: string, to?: string) =>{
+        const toDate = new Date()
+        const fromDate = new Date(Date.now() - (1000 *60*60*24*30))
+        const req_to = to || `${toDate.getFullYear()}-${toDate.getMonth()}-${toDate.getDay()}`
+        const req_from = from || `${fromDate.getFullYear()}-${fromDate.getMonth()}-${fromDate.getDay()}`
+        const res = (await axios.get(`${this.base_url}/payout-subaccounts/${ ref }/transactions/?currency=${currency || "NGN"}&&from=${req_from}&&to=${req_to}`, {
             headers: {Authorization: `Bearer ${this.secret_key}`}
-        })) as {status: string, data: fetch_transaction_res}
+        })).data as {status: string, data: fetch_transaction_res}
         return res.data
     }
 
     getBalance = async(ref: string) =>{
-        const res = (await axios.get(this.base_url + "/payout-subaccounts/"+ref, {
+        const res = (await axios.get(this.base_url + "/payout-subaccounts/"+ref + "/balances", {
             headers: {Authorization: `Bearer ${this.secret_key}`}
-        })) as {status: string, data:fetch_balance_res}
+        })).data as {status: string, data:fetch_balance_res}
         return res.data
     }
 }

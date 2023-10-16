@@ -2,8 +2,8 @@ export interface fwv_int{
     createPayment: (obj: {email: string, amount: number, subaccount: string, currency: string})=>Promise<string>
     createSubaccount: (obj: {account_name: string, email: string, mobilenumber: string, country: string})=> Promise<string>
     getSubaccount: (ref: string)=>Promise<subaccount_int>
-    updateSubaccount: (ref: string, update: {account_name: string, mobilenumber: string})=>Promise<subaccount_int>
-    getTransactions: (ref: string, from: string, to: string, currency: string)=>Promise<fetch_transaction_res>
+    updateSubaccount: (ref: string, update: {account_name: string, mobilenumber: string, email: string, country: string})=>Promise<subaccount_int>
+    getTransactions: (ref: string, currency: string, from?: string, to?: string)=>Promise<fetch_transaction_res>
     getBalance: (ref: string)=>Promise<fetch_balance_res>
 }
 
