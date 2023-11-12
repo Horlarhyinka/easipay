@@ -15,6 +15,7 @@ export interface user_int extends Document{
     username?: string
     avatar?: string
     country?: string
+    account: string
 }
 
 export type user_ref_type = user_int | string | ObjectId

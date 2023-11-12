@@ -11,7 +11,6 @@ import cookieParser from "cookie-parser";
 import path from "path";
 import notFound from "./routes/not-found";
 import config from "./config/config";
-
 import authRoute from "./routes/auth";
 import orderRouter from "./routes/order";
 import invoiceRouter from "./routes/invoice";

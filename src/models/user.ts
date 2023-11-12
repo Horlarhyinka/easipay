@@ -5,6 +5,7 @@ import jwt from "jsonwebtoken";
 import "./order";
 import bcrypt from "bcrypt";
 import config from "../config/config";  
+import FWV from "../services/fwv";
 
 const userSchema = new Schema<user_int>({
     email: {
@@ -28,7 +29,8 @@ const userSchema = new Schema<user_int>({
     },
     tel: {
         type: String,
-        match: tel_regex
+        match: tel_regex,
+        required: true
     },
     resetToken:{
         type: String
@@ -49,19 +51,35 @@ const userSchema = new Schema<user_int>({
     country:{
         type: String,
         default: "NG"
+    },
+    account: {
+        type: String,
+        required: true
     }
 },{
     timestamps: true,
     virtuals: true
 })
 
+
 userSchema.pre("save", async function(){
+    if(this.isNew){
+        const accountName = this.lastName || this.email
+        const subAccountId = await FWV.createSubaccount({account_name: accountName, email: this.email, mobilenumber: this.tel!, country: this.country || "Nigeria"})
+        this.account = subAccountId
+    }
+    if(this.isModified("password")){
     const salt = await bcrypt.genSalt(10)
     const hashedPassword = await bcrypt.hash(this.password!, salt)
     this.password = hashedPassword
-
+    }
 })
 
+userSchema.virtual("subaccount").get(async function(){
+    const subaccount = await FWV.getSubaccount(this.account)
+    return subaccount
+}
+)
 userSchema.methods.validatePassword = function(password: string):Promise<boolean>{
     return bcrypt.compare(password, this.password)
 }
