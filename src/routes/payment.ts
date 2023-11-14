@@ -6,3 +6,6 @@ const router = Router()
 
 router.use(auth)
 router.post("/initialize", payments.makePayment)
+router.get("/verify", payments.verifyPayment)
+
+export default router;

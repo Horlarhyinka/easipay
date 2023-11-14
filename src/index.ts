@@ -15,6 +15,7 @@ import authRoute from "./routes/auth";
 import orderRouter from "./routes/order";
 import invoiceRouter from "./routes/invoice";
 import profileRouter from "./routes/profile";
+import paymentRouter from "./routes/payment";
 
 const app: Application = express()
 const Server = createServer(app);
@@ -50,6 +51,7 @@ app.use("/api/v1/auth",authRoute)
 app.use("/api/v1/orders", orderRouter)
 app.use("/api/v1/invoice", invoiceRouter)
 app.use("/api/v1/profile", profileRouter)
+app.use("/api/v1/payments", paymentRouter)
 
 app.use(notFound)
 

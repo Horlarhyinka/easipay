@@ -54,7 +54,7 @@ const userSchema = new Schema<user_int>({
     },
     account: {
         type: String,
-        required: true
+        required: true,
     }
 },{
     timestamps: true,
@@ -63,15 +63,23 @@ const userSchema = new Schema<user_int>({
 
 
 userSchema.pre("save", async function(){
-    if(this.isNew){
-        const accountName = this.lastName || this.email
-        const subAccountId = await FWV.createSubaccount({account_name: accountName, email: this.email, mobilenumber: this.tel!, country: this.country || "Nigeria"})
-        this.account = subAccountId
-    }
     if(this.isModified("password")){
     const salt = await bcrypt.genSalt(10)
     const hashedPassword = await bcrypt.hash(this.password!, salt)
     this.password = hashedPassword
+    }
+})
+
+userSchema.pre("validate", async function () {
+    if(this.isNew){
+        try{
+        const accountName = this.lastName || this.email
+        const subAccountId = await FWV.createSubaccount({account_name: accountName, email: this.email, mobilenumber: this.tel!, country: this.country || "Nigeria"})
+        this.account = subAccountId
+
+        }catch(ex: any){
+            console.log(ex.response?.data)
+        }
     }
 })
 

@@ -19,7 +19,7 @@ interface ExtTransporterOption extends Transporter{
     }
 }
 
-const poolConfig = `smtps://${user}:${pass}@${host}/?service=${service}&&port=${port}`
+const poolConfig = `smtp://${user}:${pass}@${host}/?service=${service}&&port=${port}`
 
 class Mailer implements mailer_int{
     private targetMail: string = "";

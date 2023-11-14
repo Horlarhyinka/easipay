@@ -6,5 +6,5 @@ export const getCurrency = (country: string):string | undefined =>{
         /** finish this later **/
     }
     country = country.toUpperCase()
-    return country_currency_map[country]
+    return country_currency_map[country as keyof typeof country_currency_map]
 }

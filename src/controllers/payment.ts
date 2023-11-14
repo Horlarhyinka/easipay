@@ -21,11 +21,13 @@ export const makePayment = catchasync(async(req: Request, res: Response, )=>{
 
 const getTransactions = catchasync(async(req: Request, res: Response, )=>{
 
+
 })
 
 
-const verifyPayment = catchasync(async(req: Request, res: Response, )=>{
-
+export const verifyPayment = catchasync(async(req: Request, res: Response, )=>{
+    console.log(req.params, req.query)
+    return res.send(" payment verified...")
 })
 
 const withdrawToBank = catchasync(async(req: Request, res: Response, )=>{
