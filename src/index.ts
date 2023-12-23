@@ -15,12 +15,23 @@ import authRoute from "./routes/auth";
 import orderRouter from "./routes/order";
 import invoiceRouter from "./routes/invoice";
 import profileRouter from "./routes/profile";
-import paymentRouter from "./routes/payment";
+import transactionRouter from "./routes/transaction";
+import fs from "fs";
+import { checkout } from "./services/transaction";
 
 const app: Application = express()
-const Server = createServer(app);
 const {port, node_env} = config.APP
 const appPort = node_env?.includes("test")? undefined: port;
+
+
+// (async()=>{
+//     try{
+//     const res = await checkout({email: "testing@gmail.com", amount: 2000})
+//     console.log(res)
+//     }catch(ex){
+//         throw ex
+//     }
+// })()
 
 //set view engine
 app.set("views", path.join(__dirname, "/views"))
@@ -51,23 +62,28 @@ app.use("/api/v1/auth",authRoute)
 app.use("/api/v1/orders", orderRouter)
 app.use("/api/v1/invoice", invoiceRouter)
 app.use("/api/v1/profile", profileRouter)
-app.use("/api/v1/payments", paymentRouter)
+app.use("/api/v1/payments", transactionRouter)
 
 app.use(notFound)
 
 async function start(){
 
-try{
+// const Server = createServer({
+//     cert: fs.readFileSync(path.resolve(__dirname, "../cert/cert.pem")), 
+//     key: fs.readFileSync(path.resolve(__dirname, "../cert/key.pem"))}, app);
+const Server = createServer(app)
+
+try{  
 await connectDB()
 console.log("connected to db")
 }catch(ex){
     console.log("could not connect to db", ex)
 }
-app.listen(port,()=>{
+return Server.listen(port,()=>{
     console.log(`server running ${node_env} mode on port ${appPort}`)
 })
 }
 
 
-start()
+const Server = start()
 export default Server;

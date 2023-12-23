@@ -4,24 +4,21 @@ import User from "../models/user";
 import { sendDuplicateResource, sendMissingDependency, sendResourceNotFound, sendServerFailed } from "../util/responseHandlers";
 import { user_int } from "../models/types/user";
 import crypto from "crypto";
-import bcrypt from "bcrypt";
 import Mailer from "../services/mailer";
-import catchMongooseErr from "../util/catchMongooseErr";
 import config from "../config/config";
 
 export const register = catchAsync(async(req: Request, res: Response)=>{
-    const {email, password} = req.body;
+    const {email, password, ...args} = req.body;
     try{
-        const user = await User.create({email, password})
+        const user = await User.create({email, password, ...args})
         if(!user)return sendServerFailed(res, "register user")
         user.password = undefined
-        const token = user.genToken()
-        return res.status(200).json({user, token})
+        const token = user.genToken();
+        (req.session as unknown as {token: string}).token = token
+        return res.status(200).json(user)
     }catch(ex: Error | any){
         if(ex.code == 11000)return sendDuplicateResource(res, "user")
-        const messages = catchMongooseErr(ex)
-        if(!messages)return sendServerFailed(res, "register user")
-        return res.status(400).json(messages)
+        throw ex
     }
 })
 
@@ -33,18 +30,18 @@ export const login = catchAsync(async(req: Request, res: Response)=>{
     const validatePassword = await user.validatePassword(password)
     if(!validatePassword)return res.status(400).json({message: "incorrect password"});
     user.password = undefined
-    const token = user.genToken()
-    return res.status(200).json({user, token})
+    const token = user.genToken();
+    (req.session as unknown as {token: string}).token = token
+    return res.status(200).json(user)
 })
 
 export const oauthRedirect = catchAsync(async(req: Request, res: Response)=>{
     const user: user_int = req.user as user_int
     if(!user)return res.status(400).json({message: "invalid entry"})
     const token = user.genToken()
-    user.password = undefined
-    const data = {user, token}
-    res.cookie("easipay", data, {expires: new Date(Date.now() + 7200*1000)})
-    return res.status(200).json({user, token})
+    user.password = undefined;
+    (req.session as unknown as {token: string}).token = token
+    return res.status(200).json(user)
 })
 
 export const forgetPasswordTokenRequest = catchAsync(async(req: Request, res: Response)=>{
@@ -80,16 +77,10 @@ export const resetPassword = catchAsync(async(req: Request, res: Response)=>{
     user.tokenExpiresIn = undefined;
     await user.save()
     user.password = undefined;
-    const authToken = user.genToken()
-    return res.status(200).json({user, token: authToken})
+    const authToken = user.genToken();
+    (req.session as unknown as {token: string}).token = authToken
+    return res.status(200).json(user)
 })
-
-
-
-
-
-
-
 
 
 // User.deleteMany({}).then(()=>console.log("deleted all"))

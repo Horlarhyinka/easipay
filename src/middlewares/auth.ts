@@ -5,9 +5,8 @@ import jwt from "jsonwebtoken";
 import config from "../config/config";
 
 export default async(req: Request, res: Response, next: NextFunction) =>{
-    let token = req.headers.authorization
-    if(!token || !token?.toLowerCase().startsWith("bearer"))return sendUnauthenticated(res)
-    token = token.split(" ")[1]
+    let token = (req.session as unknown as {token: string}).token
+    if(!token)return sendUnauthenticated(res)
     try{
     const payload= jwt.verify(token, config.APP.secret) as {id: string, iat: number, exp: number}
     const user = await User.findById(payload.id)

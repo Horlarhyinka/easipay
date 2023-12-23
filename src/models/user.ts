@@ -1,11 +1,12 @@
-import { ObjectId, Schema, model } from "mongoose";
+import { Schema, model } from "mongoose";
 import { user_int } from "./types/user";
 import { mail_regex, tel_regex } from "../util/regex";
 import jwt from "jsonwebtoken";
 import "./order";
+import Account from "./account";
 import bcrypt from "bcrypt";
 import config from "../config/config";  
-import FWV from "../services/fwv";
+
 
 const userSchema = new Schema<user_int>({
     email: {
@@ -22,10 +23,12 @@ const userSchema = new Schema<user_int>({
     },
     firstName: {
         type: String,
-        minlength: 3
+        minlength: 3,
+        required: true
     },
     lastName:{
-        type: String
+        type: String,
+        required: true
     },
     tel: {
         type: String,
@@ -53,7 +56,8 @@ const userSchema = new Schema<user_int>({
         default: "NG"
     },
     account: {
-        type: String,
+        type: Schema.Types.ObjectId,
+        ref: "account",
         required: true,
     }
 },{
@@ -70,24 +74,18 @@ userSchema.pre("save", async function(){
     }
 })
 
-userSchema.pre("validate", async function () {
+userSchema.pre("validate", async function (next) {
     if(this.isNew){
         try{
-        const accountName = this.lastName || this.email
-        const subAccountId = await FWV.createSubaccount({account_name: accountName, email: this.email, mobilenumber: this.tel!, country: this.country || "Nigeria"})
-        this.account = subAccountId
-
-        }catch(ex: any){
-            console.log(ex.response?.data)
+            const account = await Account.create({userId: this._id})
+            this.account = account._id
+            next()
+        }catch(ex){
+            throw ex
         }
     }
 })
 
-userSchema.virtual("subaccount").get(async function(){
-    const subaccount = await FWV.getSubaccount(this.account)
-    return subaccount
-}
-)
 userSchema.methods.validatePassword = function(password: string):Promise<boolean>{
     return bcrypt.compare(password, this.password)
 }

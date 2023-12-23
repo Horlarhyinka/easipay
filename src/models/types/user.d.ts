@@ -4,8 +4,8 @@ import { order_ref_type } from "./order";
 export interface user_int extends Document{
     email: string,
     password: string | undefined, 
-    firstName?:string, 
-    lastName? : string, 
+    firstName:string, 
+    lastName : string, 
     tel?: string,
     orders: order_ref_type[],
     genToken: ()=>string,
@@ -15,7 +15,7 @@ export interface user_int extends Document{
     username?: string
     avatar?: string
     country?: string
-    account: string
+    account: ObjectId
 }
 
 export type user_ref_type = user_int | string | ObjectId

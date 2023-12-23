@@ -16,7 +16,7 @@ const fieldSchema = new mongoose.Schema<field_int>({
         type: [String],
         default: []
     }
-})
+}, {timestamps: true})
 
 
 

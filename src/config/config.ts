@@ -10,7 +10,7 @@ const BASE_URL = process.env.APP_BASE_URL || "http://localhost:7001/api/v1"
 
 const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:3000"
 
-const DB_URL = process.env.DB_URL || "mongodb://localhost:27017"
+const DB_URL = process.env.DB_URL || "mongodb://localhost:27017/expert"
 
 const MAIL_USER = process.env.MAIL_USER!
 const MAIL_PASS = process.env.MAIL_PASS !
@@ -22,17 +22,9 @@ const MAIL_SERVICE = process.env.MAIL_SERVICE || "mailtrap"
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID!
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET!
 
-const FWV_PUBLIC_KEY = process.env.FLUTTERWAVE_PUBLIC_KEY!
-const FWV_SECRET_KEY = process.env.FLUTTERWAVE_SECRET_KEY!
-const FWV_ENCRYPTION_KEY = process.env.FLUTTERWAVE_ENVRYPTION_KEY!
-const FWV_BASE_URL = process.env.FLUTTERWAVE_BASE_URL!
-
-const FWV = {
-    public_key: FWV_PUBLIC_KEY,
-    secret_key: FWV_SECRET_KEY,
-    encrryption_key: FWV_ENCRYPTION_KEY,
-    base_url: FWV_BASE_URL
-}
+const PAYMENT_SECRET_KEY = process.env.PAYMENT_SECRET_KEY!
+const PAYMENT_PUBLIC_KEY= process.env.PAYMENT_PUBLIC_KEY!
+const PAYMENT_BASE_URL=process.env.PAYMENT_BASE_URL!
 
 const GOOGLE = {
     clientId: GOOGLE_CLIENT_ID,
@@ -41,6 +33,12 @@ const GOOGLE = {
 
 const OAUTH = {
     GOOGLE
+}
+
+const PAYMENT = {
+    secret_key: PAYMENT_SECRET_KEY,
+    public_key: PAYMENT_PUBLIC_KEY,
+    base_url: PAYMENT_BASE_URL
 }
 
 const APP = {
@@ -69,7 +67,8 @@ const DB = {
 }
 
 const SERVICES = {
-    MAIL,FWV
+    MAIL,
+    PAYMENT
 }
 
 const config = {

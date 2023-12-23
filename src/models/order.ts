@@ -18,7 +18,7 @@ const orderSchema = new Schema<order_int>({
     publicId: {
         type: String
     }
-})
+}, {timestamps: true})
 
 
 export default model("order", orderSchema)

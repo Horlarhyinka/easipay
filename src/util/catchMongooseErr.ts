@@ -1,5 +1,6 @@
 export default (ex: Error | any) =>{
     const messages: string[] = []
+    if(ex.code === 1100)return {message: "duplicate resource"}
         for(let key in ex.errors){
             messages.push(ex.errors[key]?.properties?.message)
         }
