@@ -1,0 +1,1 @@
+enum transfer_source {balance="balance"}
