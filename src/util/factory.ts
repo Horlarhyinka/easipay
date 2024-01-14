@@ -13,3 +13,6 @@ export enum transaction_types{
     payment="payment",
     withdrawal="withdrawal"
 }
+
+export const default_payment_description = "EASIPAY CHECKOUT"
+export const default_payment_source = "balance"

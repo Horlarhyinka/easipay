@@ -1,6 +1,7 @@
 import config from "../config/config";
 import axios from "axios";
-import { account_info, paystack_int, recipient, transfer_int } from "./types/paystack";
+import { account_info, bank, paystack_int, recipient, transfer_int } from "./types/paystack";
+import { default_payment_description, default_payment_source } from "../util/factory";
 
 const {base_url, secret_key} = config.SERVICES.PAYMENT
 
@@ -24,8 +25,8 @@ export class Paystack implements paystack_int{
         })
         return res.data
     }
-    verifyAccount = async(account_number: string, bank_code: number) =>{
-        const res = await axios.get(`${this.payment_base_url}/bank/resolve?account_number=${account_number}&&bank_code=${bank_code}`,{
+    verifyAccount = async(obj: {account_number: string, bank_code: string}) =>{
+        const res = await axios.get(`${this.payment_base_url}/bank/resolve?account_number=${obj.account_number}&&bank_code=${obj.bank_code}`,{
             headers: {Authorization: "Bearer " + this.secret_key}
         })
         return res.data
@@ -36,11 +37,21 @@ export class Paystack implements paystack_int{
         })
         return res.data
     }
-    createTransfer = async(obj: { source: string; reason: string; amount: number; reference: string; recipient: string; }) =>{
-        const res = await axios.post(`${this.payment_base_url}/transfer`,{...obj})
+    createTransfer = async(obj: {amount: number; reference: string; recipient: string; }) =>{
+        const res = await axios.post(`${this.payment_base_url}/transfer`,{
+            ...obj, 
+            source: default_payment_source, 
+            reason: default_payment_description
+        }, {
+            headers: {
+            Authorization: `Bearer ${this.secret_key}`
+        }})
         return res.data
     }
-    
+    listBanks = async()=>{
+        const res = await axios.get(`${this.payment_base_url}/bank?country=nigeria`,)
+        return res.data
+    }
 }
 
 export default Object.freeze(new Paystack())

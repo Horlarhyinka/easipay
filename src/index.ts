@@ -16,22 +16,10 @@ import orderRouter from "./routes/order";
 import invoiceRouter from "./routes/invoice";
 import profileRouter from "./routes/profile";
 import transactionRouter from "./routes/transaction";
-import fs from "fs";
-import { checkout } from "./services/transaction";
 
 const app: Application = express()
 const {port, node_env} = config.APP
 const appPort = node_env?.includes("test")? undefined: port;
-
-
-// (async()=>{
-//     try{
-//     const res = await checkout({email: "testing@gmail.com", amount: 2000})
-//     console.log(res)
-//     }catch(ex){
-//         throw ex
-//     }
-// })()
 
 //set view engine
 app.set("views", path.join(__dirname, "/views"))

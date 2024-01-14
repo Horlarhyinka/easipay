@@ -40,7 +40,7 @@ export const paymentCallback =catchasync(async(req: Request, res: Response)=>{
 })
 
 export const withdrawToBank = catchasync(async(req: Request, res: Response)=>{
-
+    
 })
 
 export const withdrawalCallBack = catchasync(async(req: Request, res: Response)=>{

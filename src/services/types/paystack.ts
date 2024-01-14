@@ -1,10 +1,10 @@
 export interface paystack_int{
     checkout: (obj: {email: string, amount: number})=>Promise<string>
     verifyPayment: (ref: string)=>Promise<{status: boolean}>
-    verifyAccount: (account_number: string, bank_code: number) =>Promise<{status: boolean, data: account_info}>
+    verifyAccount: (obj:{account_number: string, bank_code: string}) =>Promise<{status: boolean, data: account_info}>
     createRecipient: (obj: {name: string, account_number: string, bank_code: string})=>Promise<{status: boolean, data: recipient}>
     createTransfer: (obj: {source: string, reason: string, amount: number, reference: string, recipient: string})=>Promise<transfer_int>
-    // listBank: ()=>Promise<bank[]>
+    listBanks: ()=>Promise<bank[]>
 }
 
 export interface account_info {
@@ -36,6 +36,8 @@ export interface bank{
     name: string
     slug: string
     code: number
+    country: string
+    type: string
 }
 
 
