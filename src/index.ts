@@ -16,6 +16,9 @@ import orderRouter from "./routes/order";
 import invoiceRouter from "./routes/invoice";
 import profileRouter from "./routes/profile";
 import transactionRouter from "./routes/transaction";
+import serviceRouter from "./routes/service";
+
+import "./services/cache"
 
 const app: Application = express()
 const {port, node_env} = config.APP
@@ -51,6 +54,7 @@ app.use("/api/v1/orders", orderRouter)
 app.use("/api/v1/invoice", invoiceRouter)
 app.use("/api/v1/profile", profileRouter)
 app.use("/api/v1/payments", transactionRouter)
+app.use("/api/v1/services", serviceRouter)
 
 app.use(notFound)
 

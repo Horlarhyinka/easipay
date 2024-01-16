@@ -26,6 +26,15 @@ const PAYMENT_SECRET_KEY = process.env.PAYMENT_SECRET_KEY!
 const PAYMENT_PUBLIC_KEY= process.env.PAYMENT_PUBLIC_KEY!
 const PAYMENT_BASE_URL=process.env.PAYMENT_BASE_URL!
 
+const REDIS_USER = process.env.REDIS_USER
+const REDIS_PASS = process.env.REDIS_PASS
+const REDIS_HOST = process.env.REDIS_HOST
+const REDIS_PORT = process.env.REDIS_PORT
+
+const REDIS = {
+    user: REDIS_USER, password: REDIS_PASS, host: REDIS_HOST, port: REDIS_PORT
+}
+
 const GOOGLE = {
     clientId: GOOGLE_CLIENT_ID,
     secret: GOOGLE_CLIENT_SECRET
@@ -68,7 +77,8 @@ const DB = {
 
 const SERVICES = {
     MAIL,
-    PAYMENT
+    PAYMENT,
+    REDIS
 }
 
 const config = {

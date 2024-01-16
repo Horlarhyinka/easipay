@@ -61,6 +61,7 @@
     "passport": "^0.6.0",
     "passport-google-oauth20": "^2.0.0",
     "paystack": "^2.0.1",
+    "redis": "^4.6.12",
     "supertest": "^6.3.3"
   }
 }

@@ -6,6 +6,8 @@ import { getCurrency, minAmount, transaction_types } from "../util/factory";
 import Paystack from "../services/paystack";
 import Transaction from "../models/transaction";
 import Account from "../models/account"
+import { user_int } from "../models/types/user";
+import { recipient_int, transfer_int } from "../services/types/paystack";
 
 
 export const makePayment = catchasync(async(req: Request, res: Response, )=>{
@@ -40,7 +42,25 @@ export const paymentCallback =catchasync(async(req: Request, res: Response)=>{
 })
 
 export const withdrawToBank = catchasync(async(req: Request, res: Response)=>{
-    
+    const user = req.user as user_int
+    const {account_number, bank_code, amount} = req.params
+    if(!amount)return sendMissingDependency(res, "amount")
+    if(isNaN(Number(amount)))return sendInvalidEntry(res, "amount")
+    if(!account_number || !bank_code)return sendMissingDependency(res, "account_number and bank_code")
+    try{
+        const recipient = await Paystack.createRecipient({name: `${user.firstName} ${user.lastName}`, account_number, bank_code})
+        const transfer = await Paystack.createTransfer({amount: Number(amount), reference: crypto.randomUUID(), recipient: (recipient as recipient_int).recipient_code})
+        const userAccount = await Account.getOrcreateAccount(user.email)
+        const transaction = await Transaction.create({reference: (transfer as transfer_int).reference, accountId: userAccount._id, type: transaction_types.withdrawal, amount: Number(amount)})
+        userAccount.balance = userAccount.balance - Number(amount)
+        const updatedAccount = await userAccount.save()
+        return res.status(200).json({
+            transaction, balance: updatedAccount.balance
+        })
+    }catch(err){
+        if(err.error?.response?.data)return err.error.response.data
+        return sendServerFailed(res, "complete transaction")
+    }
 })
 
 export const withdrawalCallBack = catchasync(async(req: Request, res: Response)=>{

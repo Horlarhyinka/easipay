@@ -1,6 +1,6 @@
 import config from "../config/config";
 import axios from "axios";
-import { account_info, bank, paystack_int, recipient, transfer_int } from "./types/paystack";
+import { account_info, bank, paystack_int, recipient_int, transfer_int } from "./types/paystack";
 import { default_payment_description, default_payment_source } from "../util/factory";
 
 const {base_url, secret_key} = config.SERVICES.PAYMENT

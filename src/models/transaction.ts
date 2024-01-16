@@ -25,7 +25,8 @@ const transactionSchema = new mongoose.Schema<transaction_int>({
     },
     successful: {
         type: Boolean,
-        required: true
+        required: true,
+        default: true
     },
     channel:{
         type: String
