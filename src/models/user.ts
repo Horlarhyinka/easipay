@@ -77,7 +77,7 @@ userSchema.pre("save", async function(){
 userSchema.pre("validate", async function (next) {
     if(this.isNew){
         try{
-            const account = await Account.create({userId: this._id})
+            const account = await Account.create({email: this.email})
             this.account = account._id
             next()
         }catch(ex){

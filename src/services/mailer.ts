@@ -12,12 +12,6 @@ interface mailer_int{
 
 }
 
-interface ExtTransporterOption extends Transporter{
-    auth: {
-        user: string
-        pass: string
-    }
-}
 
 const poolConfig = `smtp://${user}:${pass}@${host}/?service=${service}&&port=${port}`
 

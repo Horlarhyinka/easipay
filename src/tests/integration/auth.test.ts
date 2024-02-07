@@ -1,19 +1,15 @@
 import request from "supertest";
-import Server from "../..";
+import server from "../..";
 import User from "../../models/user";
-
-let server: typeof Server;
 
 const flushDb = async () => User.deleteMany();
 
 beforeAll(async () => {
-  server = Server.listen(0);
+    server.listen(0)
 });
 
 afterEach(async () => {
-  if (server) {
-    server.close();
-  }
+  server.closeAllConnections()
   await flushDb();
 });
 
@@ -21,34 +17,49 @@ describe("register", ()=>{
     beforeAll(async()=>await flushDb())
     afterEach(async()=>await flushDb())
 
+    function exec(body: object):any{
+        return request(server).post("/api/v1/auth/register").send(body)
+    }
+
     it("should return status 400 if no email or password is provided",async()=>{
-        const res = await request(server).post("/api/v1/auth/register").send({})
+        const res = await exec({})
         expect(res.statusCode!).toBe(400)
     })
-    it("should return status 400 if invalid is provided",async()=>{
-        const res = await request(server).post("/api/v1/auth/register").send({email: "test", password: "testing"})
+    it("should return status 400 if invalid email is provided",async()=>{
+        const res = await exec({email: "test", password: "testing"})
+        expect(res.statusCode!).toBe(400)
+    })
+    it("should return status 400 if firstName is not provided", async()=>{
+        const res = await exec({email: "testing@gmail.com", password: "testing", lastName: "test"})
+        expect(res.statusCode!).toBe(400)
+    })
+    it("should return status 400 if lastName is not provided", async()=>{
+        const res = await exec({email: "testing@gmail.com", password: "testing", firstName: "test"})
+        expect(res.statusCode!).toBe(400)
+    })
+    it("should return status 400 if tel is not provided", async()=>{
+        const res = await exec({email: "testing@gmail.com", password: "testing", lastName: "test"})
         expect(res.statusCode!).toBe(400)
     })
     it("should return status 400 if password is less than 6",async()=>{
-        const res = await request(server).post("/api/v1/auth/register").send({email: "testing@gmail.com", password: "test"})
+        const res = await exec({email: "testing@gmail.com", password: "test", firstName: "test", lastName: "test", tel: "123456789"})
         expect(res.statusCode!).toBe(400)
     })
-    it("should return 409 if email already exist", async()=>{
-        await User.create({email: "testing@gmail.com", password: "testing"})
-        const res = await request(server).post("/api/v1/auth/register").send({email: "testing@gmail.com", password: "testing"})
+    it("should return 409 if email is already registered", async()=>{
+        const obj = {email: "testing@gmail.com", password: "testing", firstName: "test", lastName: "test", tel: "123456789"}
+        await User.create(obj)
+        const res = await exec(obj)
         expect(res.statusCode!).toBe(409)
     })
     it("should return 200 status code for valid informations",async()=>{
-        User.find({}).then(res=>{
-        })
-        const res = await request(server).post("/api/v1/auth/register").send({email: "testing@gmail.com", password: "testing"})
+
+        const res = await exec({email: "testing@gmail.com", password: "testing", firstName: "test", lastName: "test", tel: "123456789"})
         expect(res.statusCode!).toBe(200)
     })
-    console.log("register test suite ran...")
 })
 
 describe("login", ()=>{
-    const createTestUser = async()=>User.create({ email: "testing@gmail.com", password: "testing"})
+    const createTestUser = async()=>User.create({email: "testing@gmail.com", password: "testing", firstName: "test", lastName: "test", tel: "123456789"})
     it("should return status 400 code if email or password is not provided",async()=>{
         const res = await request(server).post("/api/v1/auth/login").send({})
 

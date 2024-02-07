@@ -1,5 +1,6 @@
 import express, {Application, Request, Response} from "express";
-import { createServer } from "http";
+import http, {Server} from "http"
+import https from "https"
 import cors from "cors";
 import helemt from "helmet";
 import rateLimit from "express-rate-limit";
@@ -58,24 +59,28 @@ app.use("/api/v1/services", serviceRouter)
 
 app.use(notFound)
 
-async function start(){
-
-// const Server = createServer({
-//     cert: fs.readFileSync(path.resolve(__dirname, "../cert/cert.pem")), 
-//     key: fs.readFileSync(path.resolve(__dirname, "../cert/key.pem"))}, app);
-const Server = createServer(app)
-
-try{  
-await connectDB()
-console.log("connected to db")
-}catch(ex){
-    console.log("could not connect to db", ex)
+function start(){
+        connectDB()
+        .then(res=>console.log("connected to db"))
+        .catch(err=>{
+            console.log("failed to connect to db: ", err)
+            process.exit(1)
+        })
+        try {
+        const server = process.env.NODE_ENV === "production"?https.createServer({
+            cert: process.env.SSL_CERT,
+            key: process.env.SSL_KEY
+        }, app): http.createServer(app)
+        server.on("listening", ()=>{
+            console.log(" server running on port", (server.address() as {port: number}).port)
+        })
+        return server
+        } catch (error) {
+            console.log("Failed to start server:", error)
+            process.exit(1)  
+        }
 }
-return Server.listen(port,()=>{
-    console.log(`server running ${node_env} mode on port ${appPort}`)
-})
-}
 
 
-const Server = start()
-export default Server;
+const server = start()
+export default server;

@@ -43,12 +43,12 @@ export const paymentCallback =catchasync(async(req: Request, res: Response)=>{
 
 export const withdrawToBank = catchasync(async(req: Request, res: Response)=>{
     const user = req.user as user_int
-    const {account_number, bank_code, amount} = req.params
+    const {account_number, bank_code, amount} = req.body
     if(!amount)return sendMissingDependency(res, "amount")
     if(isNaN(Number(amount)))return sendInvalidEntry(res, "amount")
     if(!account_number || !bank_code)return sendMissingDependency(res, "account_number and bank_code")
     try{
-        const recipient = await Paystack.createRecipient({name: `${user.firstName} ${user.lastName}`, account_number, bank_code})
+        const recipient = await Paystack.createRecipient({name: `${user?.firstName} ${user?.lastName}`, account_number: String(account_number), bank_code: String(bank_code)})
         const transfer = await Paystack.createTransfer({amount: Number(amount), reference: crypto.randomUUID(), recipient: (recipient as recipient_int).recipient_code})
         const userAccount = await Account.getOrcreateAccount(user.email)
         const transaction = await Transaction.create({reference: (transfer as transfer_int).reference, accountId: userAccount._id, type: transaction_types.withdrawal, amount: Number(amount)})
@@ -57,12 +57,13 @@ export const withdrawToBank = catchasync(async(req: Request, res: Response)=>{
         return res.status(200).json({
             transaction, balance: updatedAccount.balance
         })
-    }catch(err){
-        if(err.error?.response?.data)return err.error.response.data
+    }catch(err: any){
+        if(err?.response?.data)return err.response.data.message
         return sendServerFailed(res, "complete transaction")
     }
 })
 
 export const withdrawalCallBack = catchasync(async(req: Request, res: Response)=>{
+    //
     
 })
