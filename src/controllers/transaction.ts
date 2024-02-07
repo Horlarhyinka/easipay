@@ -9,6 +9,10 @@ import Account from "../models/account"
 import { user_int } from "../models/types/user";
 import { recipient_int, transfer_int } from "../services/types/paystack";
 
+interface ExtReq extends Request{
+    user: user_int
+}
+
 
 export const makePayment = catchasync(async(req: Request, res: Response, )=>{
     let {email, amount} = req.body;
@@ -41,7 +45,7 @@ export const paymentCallback =catchasync(async(req: Request, res: Response)=>{
     return res.status(200).json(transaction) 
 })
 
-export const withdrawToBank = catchasync(async(req: Request, res: Response)=>{
+export const withdrawToBank = catchasync(async(req: ExtReq, res: Response)=>{
     const user = req.user as user_int
     const {account_number, bank_code, amount} = req.body
     if(!amount)return sendMissingDependency(res, "amount")

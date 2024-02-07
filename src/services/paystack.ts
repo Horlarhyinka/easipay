@@ -11,12 +11,19 @@ export class Paystack implements paystack_int{
     private app_base_url = config.APP.baseUrl
 
     checkout = async(obj:{email: string, amount: number}) =>{
+        try {
     const res = await axios.post(this.payment_base_url +"/transaction/initialize",{
                 ...obj, amount: obj.amount * 100, callback_url: this.app_base_url + "/payments/callback"
                 }, {
                      headers: {Authorization: "Bearer " + this.secret_key},
                     })
     return res.data?.data?.authorization_url
+            
+        } catch (error) {
+            console.log(error)
+            throw error
+            
+        }
     }
 
     verifyPayment = async(ref: string)=>{
