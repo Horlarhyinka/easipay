@@ -16,3 +16,4 @@ export enum transaction_types{
 
 export const default_payment_description = "EASIPAY CHECKOUT"
 export const default_payment_source = "balance"
+export const checkout_path = "/api/v1/payments/pay"

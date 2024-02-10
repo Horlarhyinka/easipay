@@ -3,13 +3,16 @@ import catchAsyncErrors from "../util/catchasync";
 import { Request, Response} from "express";
 import { validateItem } from "../util/validators";
 import payment_methods from "../util/payment_methods";
-import { sendMissingDependency, sendResourceNotFound, sendServerFailed } from "../util/responseHandlers";
+import { sendInvalidEntry, sendMissingDependency, sendResourceNotFound, sendServerFailed } from "../util/responseHandlers";
 import catchMongooseErr from "../util/catchMongooseErr";
 import { user_int } from "../models/types/user";
 import mongoose from "mongoose";
 import { order_int } from "../models/types/order";
 import { item_int } from "../models/types/item";
 import dotenv from "dotenv"
+import paystack from "../services/paystack";
+import { checkout_path } from "../util/factory";
+import { mail_regex } from "../util/regex";
 
 dotenv.config()
 
@@ -147,20 +150,14 @@ export const getOrderItem = catchAsyncErrors(async(req: Request, res: Response)=
 
 })
 
-
-
-
-
-/**
- * {
-  "items": [
-    {
-      "name": "item 01",
-      "price": 10000,
-      "note": "a nice item",
-      "quantity": 2,
-      "images": ["img01.jpg"]
-    }
-    ]
-}
- */
+export const payForOrder = catchAsyncErrors(async(req: Request, res: Response)=>{
+    const {email} = req.body
+    if(!email)return sendMissingDependency(res, "email")
+    if(!mail_regex.test(email))return sendInvalidEntry(res, "email")
+    const {orderId} = req.params
+    if(!orderId)return sendMissingDependency(res, "orderId")
+    const order = await Order.findById(orderId)
+    if(!order)return sendResourceNotFound(res, "order")
+    const url = await paystack.checkout({email, amount: await order.total})
+    return res.status(200).json(url)
+})

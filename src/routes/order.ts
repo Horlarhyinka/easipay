@@ -6,6 +6,7 @@ import validateObjectIdParam from "../middlewares/validateObjectIdParam"
 const router = Router()
 
 router.get("/:orderId/preview", validateObjectIdParam, order.getOrder)
+router.post("/:orderId/checkout", validateObjectIdParam, order.payForOrder)
 router.use(auth)
 router.post("/", order.createOrder)
 router.get("/", order.getOrders)

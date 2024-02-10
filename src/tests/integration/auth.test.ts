@@ -62,6 +62,12 @@ describe("register", ()=>{
 describe("login", ()=>{
     const obj = {email: "testing@gmail.com", password: "testing", firstName: "test", lastName: "test", tel: "123456789"}
     const createTestUser = async()=>User.create(obj)
+    beforeEach(async()=>{
+        await User.deleteMany({})
+    })
+    afterEach(async()=>{
+        await User.deleteMany({})
+    })
     it("should return status 400 code if email or password is not provided",async()=>{
         const res = await request(server).post("/api/v1/auth/login").send({})
         expect(res.statusCode!).toBe(400)

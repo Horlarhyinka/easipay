@@ -8,22 +8,20 @@ import Transaction from "../models/transaction";
 import Account from "../models/account"
 import { user_int } from "../models/types/user";
 import { recipient_int, transfer_int } from "../services/types/paystack";
+import { mail_regex } from "../util/regex";
 
 interface ExtReq extends Request{
     user: user_int
 }
 
-
 export const makePayment = catchasync(async(req: Request, res: Response, )=>{
     let {email, amount} = req.body;
     if(!email || !amount) return sendMissingDependency(res, "email and amount")
-    const user = await User.findOne({email})
-    if(!user) return sendResourceNotFound(res, "user email")
+    if(!mail_regex.test(email))return sendInvalidEntry(res, "email address")
     amount = Number(amount)
     if(isNaN(amount))return sendInvalidEntry(res, "amount")
     if(amount < minAmount)return res.status(400).json({message: `amount cannot be less than ${minAmount}`})
-    const currency = getCurrency(user.country!)
-    if(!currency)return sendInvalidEntry(res, `country (${user.country})`)
+    const currency = getCurrency("NG")
     try{
         const url = await Paystack.checkout({email, amount})
         if(!url)return res.status(501).json({message:"could not process payment at this time."})

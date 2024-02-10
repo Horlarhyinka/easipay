@@ -2,9 +2,9 @@ import { Document, ObjectId, Model } from "mongoose";
 import { item_int } from "./item";
 
 export interface order_int extends Document{
-    items: (string | ObjectId | item_int)[],
+    items: item_int[],
     method: string,
-    total: string,
+    total: number,
     note: string,
     publicId: string | ObjectId
 }

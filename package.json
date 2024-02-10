@@ -6,7 +6,8 @@
   "scripts": {
     "build": "tsc -p",
     "Dev": "nodemon /src/index.ts",
-    "test": "jest --watchAll --verbose --runInBand"
+    "test": "jest --watchAll --verbose",
+    "test-fail": "jest --onlyFailures --verbose"
   },
   "keywords": [],
   "author": "",
